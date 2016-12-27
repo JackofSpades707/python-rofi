@@ -53,3 +53,6 @@ Python 2.7 at some point though.
 
 The MIT license, the same as Rofi itself. The full text is in the
 [LICENSE](LICENSE) file in the repository.
+
+## Examples
+[Clipboard Manager](https://github.com/JackofSpades707/python-rofi/wiki/Example-Clipboard-Manager-for-Python-Rofi)
