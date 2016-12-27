@@ -51,6 +51,7 @@ class Rofi(object):
     for available markup.
 
     """
+
     def __init__(self, lines=None, fixed_lines=None, width=None,
                  fullscreen=None, location=None,
                  exit_hotkeys=('Alt+F4', 'Control+q')):
@@ -100,7 +101,6 @@ class Rofi(object):
         # (e.g., an unhandled exception).
         atexit.register(self.close)
 
-
     @classmethod
     def escape(self, string):
         """Escape a string for Pango markup.
@@ -128,8 +128,6 @@ class Rofi(object):
             62: '&gt;'
         })
 
-
-
     def close(self):
         """Close any open window.
 
@@ -148,7 +146,6 @@ class Rofi(object):
 
             # Clean up.
             self._process = None
-
 
     def _common_args(self, allow_fullscreen=True, **kwargs):
         args = []
@@ -179,7 +176,6 @@ class Rofi(object):
         # Done.
         return args
 
-
     def error(self, message, **kwargs):
         """Show an error window.
 
@@ -201,7 +197,6 @@ class Rofi(object):
         # Close any existing window and show the error.
         self.close()
         subprocess.run(args)
-
 
     def status(self, message, **kwargs):
         """Show a status message.
@@ -228,7 +223,6 @@ class Rofi(object):
         # Close any existing window, show the error, and return immediately.
         self.close()
         self._process = subprocess.Popen(args)
-
 
     def select(self, prompt, options, message="", select=None, **kwargs):
         """Show a list of options and return user selection.
@@ -291,7 +285,8 @@ class Rofi(object):
                 user_keys.add(int(match.group(1)))
                 args.extend(['-kb-custom-{0:s}'.format(match.group(1)), key])
                 if action:
-                    display_bindings.append("<b>{0:s}</b>: {1:s}".format(key, action))
+                    display_bindings.append(
+                        "<b>{0:s}</b>: {1:s}".format(key, action))
 
         # And the global exit bindings.
         exit_keys = set()
@@ -335,13 +330,13 @@ class Rofi(object):
             if key in exit_keys:
                 raise SystemExit()
         else:
-            self.exit_with_error("Unexpected rofi returncode {0:d}.".format(results.returncode))
+            self.exit_with_error(
+                "Unexpected rofi returncode {0:d}.".format(results.returncode))
 
         # And return.
         return index, key
 
-
-    def _generic_entry(self, prompt, validator, message=None):
+    def _generic_entry(self, prompt, validator, message=None, **kwargs):
         """Internal helper method for entry methods.
 
         Parameters
@@ -371,7 +366,8 @@ class Rofi(object):
             # Add any error to the given message.
             msg = message or ""
             if error:
-                msg = '<span color="#FF0000" font_weight="bold">{0:s}</span>\n{1:s}'.format(error, msg)
+                msg = '<span color="#FF0000" font_weight="bold">{0:s}</span>\n{1:s}'.format(
+                    error, msg)
                 msg = msg.rstrip('\n')
 
             # If there is actually a message to show.
@@ -394,7 +390,6 @@ class Rofi(object):
             value, error = validator(results.stdout.rstrip('\n'))
             if not error:
                 return value
-
 
     def text_entry(self, prompt, message=None, allow_blank=False, strip=True):
         """Prompt the user to enter a piece of text.
@@ -427,7 +422,6 @@ class Rofi(object):
 
         return self._generic_entry(prompt, text_validator, message)
 
-
     def integer_entry(self, prompt, message=None, min=None, max=None):
         """Prompt the user to enter an integer.
 
@@ -447,7 +441,8 @@ class Rofi(object):
         """
         # Sanity check.
         if (min is not None) and (max is not None) and not (max > min):
-            raise ValueError("Maximum limit has to be more than the minimum limit.")
+            raise ValueError(
+                "Maximum limit has to be more than the minimum limit.")
 
         def integer_validator(text):
             error = None
@@ -456,7 +451,7 @@ class Rofi(object):
             try:
                 value = int(text)
             except ValueError:
-                return None, "Please enter an integer value."
+                return error, "Please enter an integer value."
 
             # Check its within limits.
             if (min is not None) and (value < min):
@@ -467,7 +462,6 @@ class Rofi(object):
             return value, None
 
         return self._generic_entry(prompt, integer_validator, message)
-
 
     def float_entry(self, prompt, message=None, min=None, max=None):
         """Prompt the user to enter a floating point number.
@@ -488,7 +482,8 @@ class Rofi(object):
         """
         # Sanity check.
         if (min is not None) and (max is not None) and not (max > min):
-            raise ValueError("Maximum limit has to be more than the minimum limit.")
+            raise ValueError(
+                "Maximum limit has to be more than the minimum limit.")
 
         def float_validator(text):
             error = None
@@ -497,7 +492,7 @@ class Rofi(object):
             try:
                 value = float(text)
             except ValueError:
-                return None, "Please enter a floating point value."
+                return error, "Please enter a floating point value."
 
             # Check its within limits.
             if (min is not None) and (value < min):
@@ -508,7 +503,6 @@ class Rofi(object):
             return value, None
 
         return self._generic_entry(prompt, float_validator, message)
-
 
     def decimal_entry(self, prompt, message=None, min=None, max=None):
         """Prompt the user to enter a decimal number.
@@ -529,7 +523,8 @@ class Rofi(object):
         """
         # Sanity check.
         if (min is not None) and (max is not None) and not (max > min):
-            raise ValueError("Maximum limit has to be more than the minimum limit.")
+            raise ValueError(
+                "Maximum limit has to be more than the minimum limit.")
 
         def decimal_validator(text):
             error = None
@@ -538,7 +533,7 @@ class Rofi(object):
             try:
                 value = Decimal(text)
             except InvalidOperation:
-                return None, "Please enter a decimal value."
+                return error, "Please enter a decimal value."
 
             # Check its within limits.
             if (min is not None) and (value < min):
@@ -549,7 +544,6 @@ class Rofi(object):
             return value, None
 
         return self._generic_entry(prompt, decimal_validator, message)
-
 
     def exit_with_error(self, error):
         """Report an error and exit.
